@@ -1,6 +1,6 @@
 {
   "name": "flute-select",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Custom select with aligned positioning, multi-select, search, separators, lazy loading, and HTMX support",
   "main": "dist/flute-select.js",
   "types": "dist/types/index.d.ts",

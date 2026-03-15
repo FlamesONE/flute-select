@@ -81,8 +81,20 @@ export class FluteSelect {
     Registry.destroyAll();
   }
 
-  static enableHtmx(): void {
-    Registry.enableHtmx();
+  static enableHtmx(options?: Parameters<typeof Registry.enableHtmx>[0]): void {
+    Registry.enableHtmx(options);
+  }
+
+  static destroyIn(root: HTMLElement): void {
+    Registry.destroyIn(root);
+  }
+
+  static initIn(root: HTMLElement, selector?: string): void {
+    Registry.initIn(root, selector);
+  }
+
+  static getAll(): Map<HTMLElement, FluteSelect> {
+    return Registry.getAll();
   }
 
   static observe(root?: HTMLElement): void {

@@ -34,10 +34,22 @@ export class FormBridge {
     }
 
     const select = nativeEl as HTMLSelectElement;
+    let changed = false;
     for (const opt of Array.from(select.options)) {
-      opt.selected = selected.has(opt.value);
+      const shouldBeSelected = selected.has(opt.value);
+      if (opt.selected !== shouldBeSelected) {
+        opt.selected = shouldBeSelected;
+        changed = true;
+      }
     }
-    select.dispatchEvent(new Event('change', { bubbles: true }));
+
+    if (changed) {
+      // Mark as internal sync so external listeners (HTMX/Yoyo) can distinguish
+      // from user-initiated changes and avoid infinite loops
+      const event = new Event('change', { bubbles: true });
+      (event as Event & { _fsSyncInternal?: boolean })._fsSyncInternal = true;
+      select.dispatchEvent(event);
+    }
   }
 
   destroy(): void {
