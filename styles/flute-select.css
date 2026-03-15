@@ -26,7 +26,7 @@
 
   /* ── Radii ─────────────────────────────────────────────── */
   --fs-radius: 12px;
-  --fs-radius-popover: 12px;
+  --fs-radius-popover: 14px;
   --fs-radius-option: 4px;
   --fs-radius-tag: 4px;
   --fs-radius-input: 8px;
@@ -42,7 +42,7 @@
   --fs-option-py: 6px;
   --fs-option-px: 8px;
   --fs-option-gap: 8px;
-  --fs-list-padding: 4px;
+  --fs-list-padding: 5px;
   --fs-tag-px: 6px;
   --fs-tag-py: 1px;
   --fs-tag-gap: 4px;
@@ -194,6 +194,7 @@
   transform-origin: top center;
   transition: opacity 100ms ease, transform 100ms ease, visibility 0s 100ms;
   pointer-events: none;
+  font-size: var(--fs-font-size-sm);
 }
 
 /* Opens downward (default) */
@@ -217,22 +218,45 @@
 
 /* ═══ Search ═════════════════════════════════════════════════ */
 
-.fs__search { padding: var(--fs-list-padding); flex-shrink: 0; }
+.fs__search {
+  padding: var(--fs-list-padding);
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.fs__search-icon {
+  position: absolute;
+  left: calc(var(--fs-list-padding) + var(--fs-option-px));
+  display: flex;
+  align-items: center;
+  color: var(--fs-text-muted);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.fs__search-icon svg { width: 13px; height: 13px; }
 
 .fs__search-input {
   width: 100%;
-  padding: var(--fs-option-py) var(--fs-option-px);
+  padding: 7px var(--fs-option-px) 7px calc(var(--fs-option-px) + 20px);
   border: 1px solid var(--fs-border);
   border-radius: var(--fs-radius-input);
-  background: transparent;
+  background: var(--fs-bg-hover);
   color: var(--fs-text);
   font: inherit;
   font-size: var(--fs-font-size-sm);
   outline: none;
+  transition: border-color var(--fs-transition), background var(--fs-transition);
 }
 
 .fs__search-input::placeholder { color: var(--fs-text-placeholder); }
-.fs__search-input:focus { border-color: var(--fs-border-focus); }
+
+.fs__search-input:focus {
+  border-color: var(--fs-border-focus);
+  background: transparent;
+}
 
 /* ═══ Options list ═══════════════════════════════════════════ */
 
@@ -263,7 +287,7 @@
   border-radius: var(--fs-radius-option);
   cursor: pointer;
   user-select: none;
-  font-size: var(--fs-font-size);
+  font-size: inherit;
   color: var(--fs-text);
   transition: background 60ms ease;
 }
@@ -324,7 +348,7 @@
 .fs__option-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .fs__option-desc {
-  font-size: var(--fs-font-size-sm);
+  font-size: var(--fs-font-size-xs);
   color: var(--fs-text-muted);
   overflow: hidden;
   text-overflow: ellipsis;

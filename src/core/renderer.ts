@@ -104,6 +104,8 @@ export class Renderer {
 
     if (this.config.searchable) {
       const searchWrap = el('div', { class: CSS.search });
+      const searchIcon = el('span', { class: 'fs__search-icon' });
+      searchIcon.innerHTML = ICONS.search;
       this.searchInput = el('input', {
         class: CSS.searchInput,
         type: 'text',
@@ -111,7 +113,7 @@ export class Renderer {
         autocomplete: 'off',
         'aria-label': 'Search options',
       });
-      searchWrap.appendChild(this.searchInput);
+      searchWrap.append(searchIcon, this.searchInput);
       this.content.appendChild(searchWrap);
     }
 
@@ -262,6 +264,12 @@ export class Renderer {
         'aria-hidden': 'true',
       });
       this.scrollArrowDown.innerHTML = ICONS.arrow;
+
+      // Position scroll arrows relative to the list, not overlapping search
+      const searchWrap = this.content.querySelector<HTMLElement>('.fs__search');
+      if (searchWrap) {
+        this.scrollArrowUp.style.top = `${searchWrap.offsetHeight + 1}px`;
+      }
 
       this.content.appendChild(this.scrollArrowUp);
       this.content.appendChild(this.scrollArrowDown);

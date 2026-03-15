@@ -609,6 +609,10 @@ export class FluteSelect {
       this.state.filteredOptions = filterOptions(this.state.allOptions, query);
       this.state.highlighted = -1;
       this.renderer.renderOptions();
+
+      if (this.config.positioning === 'aligned' && this.state.isOpen) {
+        this.repositionAligned();
+      }
     }
   }
 
@@ -679,6 +683,16 @@ export class FluteSelect {
       this.renderer.searchInput.value = '';
       this.state.resetSearch();
     }
+  }
+
+  private repositionAligned(): void {
+    this.renderer.teardownScrollArrows();
+    this.positioning.repositionAligned(
+      this.renderer.trigger,
+      this.renderer.dropdown,
+      () => this.renderer.getSelectedOptionEl(),
+      () => this.renderer.setupScrollArrows(),
+    );
   }
 
   private onClickOutside(e: MouseEvent): void {

@@ -27,11 +27,27 @@ export class Positioning {
 
     if (config.positioning === 'aligned') {
       this.lockBodyScroll();
-      this.attachAligned(trigger, dropdown, getSelectedEl, onReady);
+      this.attachAligned(trigger, dropdown, getSelectedEl, false, onReady);
     } else {
       this.attachDropdown(trigger, dropdown, config);
       onReady?.();
     }
+  }
+
+  /**
+   * Re-layout aligned wrapper without detach/re-lock cycle.
+   * Preserves body scroll lock and list scroll position.
+   */
+  repositionAligned(
+    trigger: HTMLElement,
+    wrapper: HTMLElement,
+    getSelectedEl: () => HTMLElement | null,
+    onReady?: () => void,
+  ): void {
+    // Remove only the resize listener, keep body scroll locked
+    this.cleanup?.();
+    this.cleanup = null;
+    this.attachAligned(trigger, wrapper, getSelectedEl, true, onReady);
   }
 
   detach(): void {
@@ -97,6 +113,7 @@ export class Positioning {
     trigger: HTMLElement,
     wrapper: HTMLElement,
     getSelectedEl: () => HTMLElement | null,
+    preserveScroll: boolean,
     onReady?: () => void,
   ): void {
     const content = wrapper.querySelector<HTMLElement>('.fs__dropdown') ?? wrapper;
@@ -117,7 +134,9 @@ export class Positioning {
     wrapper.style.top = '';
     wrapper.style.bottom = '';
     wrapper.style.margin = '';
-    list.scrollTop = 0;
+    if (!preserveScroll) {
+      list.scrollTop = 0;
+    }
 
     const selectedEl = getSelectedEl();
 
@@ -135,12 +154,14 @@ export class Positioning {
     const contentStyles = window.getComputedStyle(content);
     const contentBorderTop = parseInt(contentStyles.borderTopWidth, 10) || 0;
     const contentBorderBottom = parseInt(contentStyles.borderBottomWidth, 10) || 0;
-    const contentPaddingTop = parseInt(contentStyles.paddingTop, 10) || 0;
     const contentPaddingBottom = parseInt(contentStyles.paddingBottom, 10) || 0;
+
+    // list.offsetTop includes content padding-top + search wrapper height
+    const listOffsetTop = list.offsetTop;
 
     const fullContentHeight =
       contentBorderTop +
-      contentPaddingTop +
+      listOffsetTop +
       listScrollH +
       contentPaddingBottom +
       contentBorderBottom;
@@ -163,7 +184,8 @@ export class Positioning {
       const selectedItemHalfH = selectedEl.offsetHeight / 2;
       const itemOffsetMiddle = selectedEl.offsetTop + selectedItemHalfH;
 
-      const contentTopToItemMiddle = contentBorderTop + contentPaddingTop + itemOffsetMiddle;
+      // Use listOffsetTop (includes search height) instead of contentPaddingTop
+      const contentTopToItemMiddle = contentBorderTop + listOffsetTop + itemOffsetMiddle;
       const itemMiddleToContentBottom = fullContentHeight - contentTopToItemMiddle;
 
       const triggerMidY = triggerRect.top + triggerRect.height / 2;
@@ -216,7 +238,7 @@ export class Positioning {
     }
 
     const onResize = (): void => {
-      this.attachAligned(trigger, wrapper, getSelectedEl);
+      this.attachAligned(trigger, wrapper, getSelectedEl, true);
     };
     window.addEventListener('resize', onResize);
     const prevCleanup = this.cleanup;
