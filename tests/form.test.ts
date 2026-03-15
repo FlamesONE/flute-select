@@ -1,11 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
-  computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100 })),
-  autoUpdate: vi.fn((_ref: Element, _floating: Element, cb: () => void) => {
-    cb();
-    return vi.fn();
-  }),
+  computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -13,80 +10,78 @@ vi.mock('@floating-ui/dom', () => ({
 }));
 
 import { FluteSelect } from '../src/core/core';
-import { createAnchor, createNativeSelect, FRUITS } from './helpers';
+import { createAnchor, createNativeSelect, FRUITS, getHiddenInputs } from './helpers';
 
-describe('FluteSelect — form integration', () => {
+describe('Form — Hidden inputs', () => {
   let anchor: HTMLDivElement;
-
-  beforeEach(() => {
-    anchor = createAnchor();
-  });
-  afterEach(() => {
-    FluteSelect.destroyAll();
-    document.body.innerHTML = '';
-  });
+  beforeEach(() => { anchor = createAnchor(); });
+  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
 
   it('creates hidden input with configured name', () => {
-    FluteSelect.create(anchor, { options: FRUITS, name: 'fruit', value: 'banana' });
-    const container = anchor.nextElementSibling as HTMLElement;
-    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
-    expect(input).not.toBeNull();
-    expect(input.name).toBe('fruit');
-    expect(input.value).toBe('banana');
+    const s = FluteSelect.create(anchor, { options: FRUITS, name: 'fruit', value: 'banana' });
+    const inputs = getHiddenInputs(s.element);
+    expect(inputs).toHaveLength(1);
+    expect(inputs[0]!.name).toBe('fruit');
+    expect(inputs[0]!.value).toBe('banana');
   });
 
   it('creates multiple inputs with [] suffix for multi-select', () => {
-    FluteSelect.create(anchor, {
-      options: FRUITS,
-      name: 'fruits',
-      multiple: true,
-      value: ['apple', 'cherry'],
+    const s = FluteSelect.create(anchor, {
+      options: FRUITS, name: 'fruits', multiple: true, value: ['apple', 'cherry'],
     });
-    const container = anchor.nextElementSibling as HTMLElement;
-    const inputs = container.querySelectorAll('input[type="hidden"]');
-    expect(inputs.length).toBe(2);
-    expect((inputs[0] as HTMLInputElement).name).toBe('fruits[]');
-    expect((inputs[0] as HTMLInputElement).value).toBe('apple');
-    expect((inputs[1] as HTMLInputElement).name).toBe('fruits[]');
-    expect((inputs[1] as HTMLInputElement).value).toBe('cherry');
+    const inputs = getHiddenInputs(s.element);
+    expect(inputs).toHaveLength(2);
+    expect(inputs[0]!.name).toBe('fruits[]');
+    expect(inputs[0]!.value).toBe('apple');
+    expect(inputs[1]!.name).toBe('fruits[]');
+    expect(inputs[1]!.value).toBe('cherry');
   });
 
   it('updates hidden input on value change', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, name: 'f', value: 'apple' });
     s.setValue('grape');
-    const container = anchor.nextElementSibling as HTMLElement;
-    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
-    expect(input.value).toBe('grape');
+    const inputs = getHiddenInputs(s.element);
+    expect(inputs).toHaveLength(1);
+    expect(inputs[0]!.value).toBe('grape');
   });
 
   it('creates empty hidden input when no value and name is set', () => {
-    FluteSelect.create(anchor, { options: FRUITS, name: 'f' });
-    const container = anchor.nextElementSibling as HTMLElement;
-    const input = container.querySelector('input[type="hidden"]') as HTMLInputElement;
-    expect(input.value).toBe('');
+    const s = FluteSelect.create(anchor, { options: FRUITS, name: 'f' });
+    const inputs = getHiddenInputs(s.element);
+    expect(inputs).toHaveLength(1);
+    expect(inputs[0]!.value).toBe('');
   });
 
-  it('does not create hidden input without name', () => {
-    FluteSelect.create(anchor, { options: FRUITS, value: 'apple' });
-    const container = anchor.nextElementSibling as HTMLElement;
-    expect(container.querySelector('input[type="hidden"]')).toBeNull();
+  it('does not create hidden input when no name', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS, value: 'apple' });
+    const inputs = getHiddenInputs(s.element);
+    expect(inputs).toHaveLength(0);
   });
+});
 
-  it('clearable button clears value and updates input', () => {
+describe('Form — Clear button', () => {
+  let anchor: HTMLDivElement;
+  beforeEach(() => { anchor = createAnchor(); });
+  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+
+  it('clears value and updates hidden input', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS,
-      name: 'f',
-      value: 'banana',
-      clearable: true,
+      options: FRUITS, name: 'f', value: 'banana', clearable: true,
     });
     const clearBtn = s.element.querySelector('[aria-label="Clear"]') as HTMLElement;
+    expect(clearBtn).not.toBeNull();
     clearBtn.click();
     expect(s.getValue()).toBe('');
-    const input = s.element.querySelector('input[type="hidden"]') as HTMLInputElement;
-    expect(input.value).toBe('');
+    const inputs = getHiddenInputs(s.element);
+    expect(inputs).toHaveLength(1);
+    expect(inputs[0]!.value).toBe('');
   });
+});
 
-  it('syncs native <select> on value change', () => {
+describe('Form — Native select sync', () => {
+  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+
+  it('syncs value back to native select on change', () => {
     const native = createNativeSelect([
       { value: 'a', label: 'A' },
       { value: 'b', label: 'B' },
@@ -94,11 +89,10 @@ describe('FluteSelect — form integration', () => {
     ]);
     const s = FluteSelect.fromElement(native);
     s.setValue('c');
-    const selected = Array.from(native.selectedOptions).map((o) => o.value);
-    expect(selected).toEqual(['c']);
+    expect(Array.from(native.selectedOptions).map((o) => o.value)).toEqual(['c']);
   });
 
-  it('native <select> change event fires on sync', () => {
+  it('fires change event on native select', () => {
     const native = createNativeSelect([
       { value: 'a', label: 'A' },
       { value: 'b', label: 'B' },

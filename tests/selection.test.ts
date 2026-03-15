@@ -1,11 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
-  computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100 })),
-  autoUpdate: vi.fn((_ref: Element, _floating: Element, cb: () => void) => {
-    cb();
-    return vi.fn();
-  }),
+  computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -13,188 +10,194 @@ vi.mock('@floating-ui/dom', () => ({
 }));
 
 import { FluteSelect } from '../src/core/core';
-import { createAnchor, FRUITS, FRUITS_WITH_DISABLED, getVisibleOptions } from './helpers';
+import {
+  createAnchor, FRUITS, FRUITS_WITH_DISABLED,
+  clickTrigger, assertOpen, assertClosed, assertSelectedValues,
+  assertTriggerLabel, assertPlaceholder,
+  getVisibleOptions, getTags,
+} from './helpers';
 
-describe('FluteSelect — single select', () => {
+describe('Selection — Single mode', () => {
   let anchor: HTMLDivElement;
+  beforeEach(() => { anchor = createAnchor(); });
+  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
 
-  beforeEach(() => {
-    anchor = createAnchor();
-  });
-  afterEach(() => {
-    FluteSelect.destroyAll();
-    document.body.innerHTML = '';
+  it('click selects and closes', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS });
+    s.open();
+    getVisibleOptions()[2]!.click(); // cherry
+    expect(s.getValue()).toBe('cherry');
+    assertClosed(s.element);
   });
 
   it('setValue / getValue', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
-    s.setValue('cherry');
-    expect(s.getValue()).toBe('cherry');
-  });
-
-  it('setValue replaces previous value (single mode)', () => {
-    const s = FluteSelect.create(anchor, { options: FRUITS, value: 'apple' });
     s.setValue('banana');
     expect(s.getValue()).toBe('banana');
+    assertTriggerLabel(s.element, 'Banana');
   });
 
-  it('clear() empties selection', () => {
+  it('clear resets to empty', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, value: 'grape' });
     s.clear();
     expect(s.getValue()).toBe('');
+    assertPlaceholder(s.element, 'Select...');
   });
 
-  it('clicking an option selects it and closes (single mode)', () => {
-    const s = FluteSelect.create(anchor, { options: FRUITS });
-    s.open();
-    const opts = getVisibleOptions();
-    expect(opts.length).toBe(5);
-    opts[2]!.click(); // cherry
-    expect(s.getValue()).toBe('cherry');
-    expect(s.element.classList.contains('fs--open')).toBe(false);
-  });
-
-  it('shows selected label in trigger', () => {
-    const s = FluteSelect.create(anchor, { options: FRUITS, value: 'banana' });
-    const label = s.element.querySelector('.fs__trigger-label');
-    expect(label?.textContent).toBe('Banana');
-  });
-
-  it('shows placeholder when empty', () => {
-    const s = FluteSelect.create(anchor, { options: FRUITS, placeholder: 'Pick...' });
-    const label = s.element.querySelector('.fs__trigger-label');
-    expect(label?.textContent).toBe('Pick...');
-    expect(label?.classList.contains('fs__trigger-label--empty')).toBe(true);
-  });
-
-  it('shows checkmark on selected option', () => {
-    const s = FluteSelect.create(anchor, { options: FRUITS, value: 'apple' });
-    s.open();
-    const selected = document.querySelector('.fs__option--selected');
-    expect(selected).not.toBeNull();
-    expect(selected?.querySelector('.fs__option-check')).not.toBeNull();
-    expect(selected?.getAttribute('data-value')).toBe('apple');
-  });
-
-  it('disabled option has disabled class', () => {
-    const s = FluteSelect.create(anchor, { options: FRUITS_WITH_DISABLED });
-    s.open();
-    const opts = getVisibleOptions();
-    const disabledOpt = opts.find((o) => o.getAttribute('data-value') === 'banana');
-    expect(disabledOpt?.classList.contains('fs__option--disabled')).toBe(true);
-  });
-
-  it('setValue with silent=true does not fire onChange', () => {
-    const onChange = vi.fn();
-    const s = FluteSelect.create(anchor, { options: FRUITS, onChange });
-    s.setValue('apple', true);
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it('clear with silent=true does not fire onChange', () => {
-    const onChange = vi.fn();
-    const s = FluteSelect.create(anchor, { options: FRUITS, value: 'apple', onChange });
-    s.clear(true);
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it('closeOnSelect=false keeps dropdown open in single mode', () => {
+  it('clicking same value re-selects (no toggle in single mode)', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, closeOnSelect: false });
     s.open();
-    const opts = getVisibleOptions();
-    opts[0]!.click();
-    expect(s.element.classList.contains('fs--open')).toBe(true);
+    getVisibleOptions()[0]!.click(); // apple
+    expect(s.getValue()).toBe('apple');
+    // Click apple again
+    getVisibleOptions()[0]!.click();
+    expect(s.getValue()).toBe('apple'); // still selected, not toggled off
   });
 
-  it('has-value class is added when value exists', () => {
+  it('closeOnSelect=false keeps dropdown open', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS, closeOnSelect: false });
+    s.open();
+    getVisibleOptions()[0]!.click();
+    assertOpen(s.element);
+  });
+
+  it('hasValue() returns correct result', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS, value: 'cherry' });
+    expect(s.hasValue('cherry')).toBe(true);
+    expect(s.hasValue('banana')).toBe(false);
+  });
+
+  it('getSelectedOptions() returns full objects', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS, value: 'grape' });
+    const selected = s.getSelectedOptions();
+    expect(selected).toHaveLength(1);
+    expect(selected[0]!.value).toBe('grape');
+    expect(selected[0]!.label).toBe('Grape');
+  });
+
+  it('has-value CSS class is added when value exists', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, value: 'apple' });
     expect(s.element.classList.contains('fs--has-value')).toBe(true);
   });
 
-  it('has-value class is removed on clear', () => {
+  it('has-value CSS class is removed on clear', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, value: 'apple' });
     s.clear();
     expect(s.element.classList.contains('fs--has-value')).toBe(false);
   });
+
+  it('setValue replaces previous value', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS, value: 'apple' });
+    s.setValue('banana');
+    expect(s.getValue()).toBe('banana');
+  });
 });
 
-describe('FluteSelect — multi-select', () => {
+describe('Selection — Multi mode', () => {
   let anchor: HTMLDivElement;
+  beforeEach(() => { anchor = createAnchor(); });
+  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
 
-  beforeEach(() => {
-    anchor = createAnchor();
-  });
-  afterEach(() => {
-    FluteSelect.destroyAll();
-    document.body.innerHTML = '';
-  });
-
-  it('multiple values via setValue', () => {
-    const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true });
-    s.setValue(['apple', 'cherry']);
-    expect(s.getValue()).toEqual(['apple', 'cherry']);
-  });
-
-  it('clicking toggles selection in multi mode', () => {
+  it('click toggles selection', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true });
     s.open();
     getVisibleOptions()[0]!.click(); // select apple
     expect(s.getValue()).toEqual(['apple']);
-    // After re-render, get fresh options and deselect
-    getVisibleOptions()[0]!.click();
+    getVisibleOptions()[0]!.click(); // deselect apple
     expect((s.getValue() as string[]).includes('apple')).toBe(false);
   });
 
-  it('does not close on select in multi mode', () => {
+  it('does not close on select by default', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true });
     s.open();
     getVisibleOptions()[0]!.click();
-    expect(s.element.classList.contains('fs--open')).toBe(true);
+    assertOpen(s.element);
   });
 
-  it('renders tags for selected values', () => {
+  it('closeOnSelect=true closes dropdown', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true, closeOnSelect: true });
+    s.open();
+    getVisibleOptions()[0]!.click();
+    assertClosed(s.element);
+  });
+
+  it('renders tags with remove buttons', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS,
-      multiple: true,
-      value: ['apple', 'grape'],
+      options: FRUITS, multiple: true, value: ['apple', 'grape'],
     });
-    const tags = s.element.querySelectorAll('.fs__tag');
-    expect(tags.length).toBe(2);
+    const tags = getTags(s.element);
+    expect(tags).toHaveLength(2);
     expect(tags[0]!.querySelector('.fs__tag-label')?.textContent).toBe('Apple');
     expect(tags[1]!.querySelector('.fs__tag-label')?.textContent).toBe('Grape');
+    expect(tags[0]!.querySelector('.fs__tag-remove')).not.toBeNull();
   });
 
-  it('tag remove button deselects the option', () => {
+  it('tag remove deselects value', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS,
-      multiple: true,
-      value: ['apple', 'banana'],
+      options: FRUITS, multiple: true, value: ['apple', 'banana'],
     });
     const removeBtn = s.element.querySelector('.fs__tag-remove') as HTMLElement;
-    expect(removeBtn).not.toBeNull();
     removeBtn.click();
-    expect((s.getValue() as string[]).length).toBe(1);
+    expect((s.getValue() as string[])).toHaveLength(1);
   });
 
-  it('maxItems prevents adding more selections', () => {
+  it('maxItems prevents excess selections', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS,
-      multiple: true,
-      maxItems: 2,
-      value: ['apple', 'banana'],
+      options: FRUITS, multiple: true, maxItems: 2, value: ['apple', 'banana'],
     });
     s.open();
-    const opts = getVisibleOptions();
-    const cherryOpt = opts.find((o) => o.getAttribute('data-value') === 'cherry');
-    cherryOpt?.click();
-    expect((s.getValue() as string[]).length).toBe(2);
+    const cherry = getVisibleOptions().find((o) => o.getAttribute('data-value') === 'cherry');
+    cherry?.click();
+    expect((s.getValue() as string[])).toHaveLength(2);
+    expect((s.getValue() as string[])).not.toContain('cherry');
   });
 
-  it('getSelectedOptions returns full option objects', () => {
+  it('selectAll selects all non-disabled options', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS_WITH_DISABLED, multiple: true });
+    s.selectAll();
+    const val = s.getValue() as string[];
+    expect(val).toContain('apple');
+    expect(val).toContain('cherry');
+    expect(val).not.toContain('banana'); // disabled
+  });
+
+  it('selectAll respects maxItems', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true, maxItems: 2 });
+    s.selectAll();
+    expect((s.getValue() as string[])).toHaveLength(2);
+  });
+
+  it('deselectAll clears all', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS,
-      multiple: true,
-      value: ['apple', 'cherry'],
+      options: FRUITS, multiple: true, value: ['apple', 'banana'],
+    });
+    s.deselectAll();
+    expect(s.getValue()).toEqual([]);
+  });
+
+  it('getValue returns array (empty when nothing selected)', () => {
+    const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true });
+    expect(s.getValue()).toEqual([]);
+  });
+
+  it('getValue returns array of selected values', () => {
+    const s = FluteSelect.create(anchor, {
+      options: FRUITS, multiple: true, value: ['apple', 'cherry'],
+    });
+    expect(s.getValue()).toEqual(['apple', 'cherry']);
+  });
+
+  it('hasValue() works in multi mode', () => {
+    const s = FluteSelect.create(anchor, {
+      options: FRUITS, multiple: true, value: ['apple', 'cherry'],
+    });
+    expect(s.hasValue('apple')).toBe(true);
+    expect(s.hasValue('banana')).toBe(false);
+  });
+
+  it('getSelectedOptions() returns full objects in multi mode', () => {
+    const s = FluteSelect.create(anchor, {
+      options: FRUITS, multiple: true, value: ['apple', 'cherry'],
     });
     const selected = s.getSelectedOptions();
     expect(selected).toHaveLength(2);
@@ -202,19 +205,12 @@ describe('FluteSelect — multi-select', () => {
     expect(selected[1]!.label).toBe('Cherry');
   });
 
-  it('closeOnSelect=true closes dropdown in multi mode', () => {
-    const s = FluteSelect.create(anchor, {
-      options: FRUITS,
-      multiple: true,
-      closeOnSelect: true,
-    });
-    s.open();
-    getVisibleOptions()[0]!.click();
-    expect(s.element.classList.contains('fs--open')).toBe(false);
-  });
-
-  it('getValue returns empty array when nothing selected (multi)', () => {
+  it('has-value class management in multi mode', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true });
-    expect(s.getValue()).toEqual([]);
+    expect(s.element.classList.contains('fs--has-value')).toBe(false);
+    s.setValue(['apple']);
+    expect(s.element.classList.contains('fs--has-value')).toBe(true);
+    s.clear();
+    expect(s.element.classList.contains('fs--has-value')).toBe(false);
   });
 });
