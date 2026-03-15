@@ -565,7 +565,7 @@ export class FluteSelect {
   private afterSelectionChange(silent: boolean): void {
     this.renderer.updateTriggerDisplay();
     this.form.sync(this.config.name, this.state.selected, this.config.multiple);
-    this.form.syncNativeSelect(this.originalElement, this.state.selected);
+    this.form.syncNativeSelect(this.originalElement, this.state.selected, silent);
 
     if (this.state.isOpen) {
       this.renderer.renderOptions();

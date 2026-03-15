@@ -28,24 +28,20 @@ export class FormBridge {
     }
   }
 
-  syncNativeSelect(nativeEl: HTMLElement, selected: Set<string>): void {
+  syncNativeSelect(nativeEl: HTMLElement, selected: Set<string>, silent = false): void {
     if (nativeEl.tagName !== 'SELECT') {
       return;
     }
 
     const select = nativeEl as HTMLSelectElement;
-    let changed = false;
     for (const opt of Array.from(select.options)) {
-      const shouldBeSelected = selected.has(opt.value);
-      if (opt.selected !== shouldBeSelected) {
-        opt.selected = shouldBeSelected;
-        changed = true;
-      }
+      opt.selected = selected.has(opt.value);
     }
 
-    if (changed) {
-      // Mark as internal sync so external listeners (HTMX/Yoyo) can distinguish
-      // from user-initiated changes and avoid infinite loops
+    // When silent (e.g. restoring value after HTMX swap, initial setValue),
+    // do NOT dispatch change — this prevents infinite loops with HTMX/Yoyo
+    // where change → request → swap → init → syncNativeSelect → change → ...
+    if (!silent) {
       const event = new Event('change', { bubbles: true });
       (event as Event & { _fsSyncInternal?: boolean })._fsSyncInternal = true;
       select.dispatchEvent(event);
