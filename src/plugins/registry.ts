@@ -62,6 +62,10 @@ export class Registry {
           const saved: SavedState = { value: instance.getValue() };
           node.setAttribute('data-fs-saved', JSON.stringify(saved));
           instance.destroy();
+          // Keep native select hidden during swap to avoid flash
+          if (node.tagName === 'SELECT') {
+            (node as HTMLSelectElement).style.display = 'none';
+          }
         }
       }
     }) as EventListener);
