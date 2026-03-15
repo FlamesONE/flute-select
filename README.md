@@ -1,5 +1,7 @@
 # FluteSelect
 
+![Flute Select](banner.png)
+
 Custom select with macOS/Radix-style aligned positioning, multi-select, search, separators, lazy loading, and HTMX support.
 
 ## Features
