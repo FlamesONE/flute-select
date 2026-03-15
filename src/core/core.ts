@@ -403,6 +403,11 @@ export class FluteSelect {
 
     if (this.originalElement.tagName === 'SELECT') {
       this.originalElement.style.display = '';
+      // Restore name attribute removed during build()
+      if (this.config.name) {
+        const n = this.config.multiple ? `${this.config.name}[]` : this.config.name;
+        (this.originalElement as HTMLSelectElement).setAttribute('name', n);
+      }
     }
 
     Registry.unregister(this.originalElement);
@@ -439,6 +444,9 @@ export class FluteSelect {
 
     if (this.originalElement.tagName === 'SELECT') {
       this.originalElement.style.display = 'none';
+      // Remove name from native select to prevent duplicate form submission
+      // (FormBridge creates its own hidden inputs with the correct name)
+      (this.originalElement as HTMLSelectElement).removeAttribute('name');
     }
 
     const elements = this.renderer.buildContainer(this.id);
