@@ -1,11 +1,11 @@
 import type { SelectConfig, SelectItem, SelectOption, SelectGroup, SelectSeparator } from '../types';
 
 export function isGroup(item: SelectItem): item is SelectGroup {
-  return 'options' in item && Array.isArray((item as SelectGroup).options);
+  return 'options' in item && Array.isArray((item as Record<string, unknown>).options);
 }
 
 export function isSeparator(item: SelectItem): item is SelectSeparator {
-  return 'separator' in item && (item as SelectSeparator).separator === true;
+  return 'separator' in item && (item as Record<string, unknown>).separator === true;
 }
 
 export interface ParsedOptions {
