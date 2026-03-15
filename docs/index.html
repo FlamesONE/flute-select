@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluteSelect — Demo</title>
+  <link rel="stylesheet" href="flute-select.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #09090b;
+      color: #fafafa;
+      min-height: 100vh;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 660px;
+      margin: 0 auto;
+      padding: 48px 20px 180px;
+    }
+
+    header { margin-bottom: 48px; }
+    header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.03em; }
+    header p { color: #52525b; font-size: 13px; margin-top: 6px; line-height: 1.5; }
+
+    section { margin-bottom: 40px; }
+
+    section h2 {
+      font-size: 11px;
+      font-weight: 500;
+      color: #52525b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #18181b;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #3f3f46;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .row > * { flex: 1; min-width: 0; }
+
+    .col { display: flex; flex-direction: column; gap: 10px; }
+
+    .out {
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 11px;
+      color: #3f3f46;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    .btns {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .btn {
+      padding: 4px 10px;
+      font-size: 11px;
+      border: 1px solid #1e1e21;
+      border-radius: 4px;
+      background: transparent;
+      color: #52525b;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 80ms;
+    }
+    .btn:hover { border-color: #27272a; color: #a1a1aa; }
+
+    .light-box {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .log {
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 10px;
+      color: #3f3f46;
+      max-height: 80px;
+      overflow-y: auto;
+      line-height: 1.7;
+      white-space: pre;
+      margin-top: 8px;
+    }
+
+    label.label {
+      display: block;
+      font-size: 11px;
+      color: #71717a;
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 480px) {
+      .row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>FluteSelect</h1>
+    <p>Custom select — dropdown &amp; aligned (macOS/Radix) positioning, multi-select, search, groups, separators, lazy loading, HTMX</p>
+  </header>
+
+  <!-- ─── Basic ──────────────────────────────────────────── -->
+  <section>
+    <h2>Basic</h2>
+    <div class="row">
+      <div class="col">
+        <label class="label">Default</label>
+        <div id="d-simple"></div>
+      </div>
+      <div class="col">
+        <label class="label">Clearable + preselected</label>
+        <div id="d-clearable"></div>
+      </div>
+    </div>
+    <div class="out" id="o-simple">&mdash;</div>
+  </section>
+
+  <!-- ─── Native <select> ────────────────────────────────── -->
+  <section>
+    <h2>From native &lt;select&gt;</h2>
+    <select id="d-native" name="tz">
+      <optgroup label="Americas">
+        <option value="est">Eastern</option>
+        <option value="cst">Central</option>
+        <option value="pst" selected>Pacific</option>
+      </optgroup>
+      <optgroup label="Europe">
+        <option value="gmt">GMT</option>
+        <option value="cet">CET</option>
+      </optgroup>
+    </select>
+  </section>
+
+  <!-- ─── Separators ─────────────────────────────────────── -->
+  <section>
+    <h2>Separators</h2>
+    <div class="hint">Visual dividers between logical option groups</div>
+    <div class="row">
+      <div id="d-sep"></div>
+      <div id="d-sep2"></div>
+    </div>
+  </section>
+
+  <!-- ─── Grouped ────────────────────────────────────────── -->
+  <section>
+    <h2>Groups</h2>
+    <div class="row">
+      <div class="col">
+        <label class="label">Food categories</label>
+        <div id="d-grouped"></div>
+      </div>
+      <div class="col">
+        <label class="label">Timezones</label>
+        <div id="d-tz"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Multi ──────────────────────────────────────────── -->
+  <section>
+    <h2>Multi-select</h2>
+    <div class="row">
+      <div class="col">
+        <label class="label">Tags + search</label>
+        <div id="d-multi"></div>
+      </div>
+      <div class="col">
+        <label class="label">Max 3 items</label>
+        <div id="d-max"></div>
+      </div>
+    </div>
+    <div class="out" id="o-multi">["ts","go"]</div>
+  </section>
+
+  <!-- ─── Search & Create ────────────────────────────────── -->
+  <section>
+    <h2>Search &amp; Create</h2>
+    <div class="row">
+      <div class="col">
+        <label class="label">Client-side filter</label>
+        <div id="d-search"></div>
+      </div>
+      <div class="col">
+        <label class="label">Creatable tags</label>
+        <div id="d-create"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Rich options ───────────────────────────────────── -->
+  <section>
+    <h2>Rich options</h2>
+    <div class="row">
+      <div class="col">
+        <label class="label">Avatar + description</label>
+        <div id="d-rich"></div>
+      </div>
+      <div class="col">
+        <label class="label">Custom render</label>
+        <div id="d-custom"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Custom tags ─────────────────────────────────────── -->
+  <section>
+    <h2>Custom tags</h2>
+    <div class="hint">Multi-select with user cards as tags and custom option rendering</div>
+    <div id="d-user-tags"></div>
+  </section>
+
+  <!-- ─── Sizes ──────────────────────────────────────────── -->
+  <section>
+    <h2>Sizes</h2>
+    <div class="row">
+      <div class="col">
+        <label class="label">Small</label>
+        <div id="d-sm"></div>
+      </div>
+      <div class="col">
+        <label class="label">Medium</label>
+        <div id="d-md"></div>
+      </div>
+      <div class="col">
+        <label class="label">Large</label>
+        <div id="d-lg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Lazy ───────────────────────────────────────────── -->
+  <section>
+    <h2>Lazy loading</h2>
+    <div class="hint">Paginated mock API — 60 users, 15/page, 400ms debounce</div>
+    <div id="d-lazy"></div>
+    <div class="out" id="o-lazy">&mdash;</div>
+  </section>
+
+  <!-- ─── Theming ────────────────────────────────────────── -->
+  <section>
+    <h2>Theming</h2>
+    <div class="row">
+      <div class="col">
+        <label class="label">Light theme</label>
+        <div class="light-box">
+          <div id="d-light"></div>
+        </div>
+      </div>
+      <div class="col">
+        <label class="label">Disabled</label>
+        <div id="d-disabled"></div>
+        <div class="btns">
+          <button class="btn" onclick="demos.disabled.enable()">Enable</button>
+          <button class="btn" onclick="demos.disabled.disable()">Disable</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── API playground ─────────────────────────────────── -->
+  <section>
+    <h2>API playground</h2>
+    <div id="d-api"></div>
+    <div class="btns">
+      <button class="btn" onclick="api('open')">open</button>
+      <button class="btn" onclick="api('close')">close</button>
+      <button class="btn" onclick="api('sv')">setValue</button>
+      <button class="btn" onclick="api('clear')">clear</button>
+      <button class="btn" onclick="api('disable')">disable</button>
+      <button class="btn" onclick="api('enable')">enable</button>
+      <button class="btn" onclick="api('add')">addOption</button>
+      <button class="btn" onclick="api('rm')">removeOption</button>
+      <button class="btn" onclick="api('all')">selectAll</button>
+      <button class="btn" onclick="api('none')">deselectAll</button>
+    </div>
+    <div class="out" id="o-api">&mdash;</div>
+  </section>
+
+  <!-- ─── Events ─────────────────────────────────────────── -->
+  <section>
+    <h2>Events</h2>
+    <div id="d-events"></div>
+    <div class="log" id="o-events"></div>
+  </section>
+
+  <!-- ─── Aligned (macOS / Radix style) ─────────────────── -->
+  <section>
+    <h2>Aligned positioning (macOS / Radix)</h2>
+    <div class="hint">Selected item centers over the trigger. Height adjusts to available viewport space. Body scroll locked while open.</div>
+    <div class="row">
+      <div class="col">
+        <label class="label">Fruits (flat)</label>
+        <div id="d-aligned-fruits"></div>
+      </div>
+      <div class="col">
+        <label class="label">Grouped food</label>
+        <div id="d-aligned1"></div>
+      </div>
+      <div class="col">
+        <label class="label">Timezones</label>
+        <div id="d-aligned2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Aligned edge cases ─────────────────────────────── -->
+  <section>
+    <h2>Aligned — edge cases</h2>
+    <div class="hint">150+ countries — tests scroll, arrows, and viewport clamping</div>
+    <div class="row">
+      <div class="col">
+        <label class="label">No preselection (150+)</label>
+        <div id="d-aligned-none"></div>
+      </div>
+      <div class="col">
+        <label class="label">Grouped countries</label>
+        <div id="d-aligned-few"></div>
+      </div>
+      <div class="col">
+        <label class="label">Last item (Zimbabwe)</label>
+        <div id="d-aligned-last"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="flute-select.js"></script>
+<script>
+const demos = {};
+
+const fruits = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'blueberry', label: 'Blueberry' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'grape', label: 'Grape' },
+  { value: 'mango', label: 'Mango' },
+  { value: 'orange', label: 'Orange' },
+  { value: 'peach', label: 'Peach' },
+  { value: 'pineapple', label: 'Pineapple' },
+  { value: 'strawberry', label: 'Strawberry' },
+];
+
+const langs = [
+  { value: 'ts', label: 'TypeScript' },
+  { value: 'js', label: 'JavaScript' },
+  { value: 'go', label: 'Go' },
+  { value: 'rs', label: 'Rust' },
+  { value: 'py', label: 'Python' },
+  { value: 'rb', label: 'Ruby' },
+  { value: 'java', label: 'Java' },
+  { value: 'php', label: 'PHP' },
+];
+
+const tzGroups = [
+  { label: 'North America', options: [
+    { value: 'est', label: 'Eastern Standard Time' },
+    { value: 'cst', label: 'Central Standard Time' },
+    { value: 'mst', label: 'Mountain Standard Time' },
+    { value: 'pst', label: 'Pacific Standard Time' },
+  ]},
+  { label: 'Europe', options: [
+    { value: 'gmt', label: 'Greenwich Mean Time' },
+    { value: 'cet', label: 'Central European Time' },
+    { value: 'eet', label: 'Eastern European Time' },
+  ]},
+  { label: 'Asia', options: [
+    { value: 'msk', label: 'Moscow Time' },
+    { value: 'ist', label: 'India Standard Time' },
+    { value: 'jst', label: 'Japan Standard Time' },
+  ]},
+];
+
+const foodGroups = [
+  { label: 'Fruits', options: [
+    { value: 'apple', label: 'Apple' },
+    { value: 'banana', label: 'Banana' },
+    { value: 'blueberry', label: 'Blueberry' },
+    { value: 'grape', label: 'Grapes' },
+  ]},
+  { label: 'Vegetables', options: [
+    { value: 'carrot', label: 'Carrot' },
+    { value: 'broccoli', label: 'Broccoli' },
+    { value: 'spinach', label: 'Spinach' },
+  ]},
+];
+
+const users = [
+  { value: '1', label: 'Sarah Connor', description: 'sarah@skynet.com', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=sarah&size=40' },
+  { value: '2', label: 'John Doe', description: 'john@example.com', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=john&size=40' },
+  { value: '3', label: 'Alice Smith', description: 'alice@wonder.land', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=alice&size=40' },
+  { value: '4', label: 'Bob Builder', description: 'bob@build.it', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=bob&size=40' },
+];
+
+const actions = [
+  { value: 'edit', label: 'Edit' },
+  { value: 'duplicate', label: 'Duplicate' },
+  { separator: true },
+  { value: 'archive', label: 'Archive' },
+  { value: 'move', label: 'Move to...' },
+  { separator: true },
+  { value: 'delete', label: 'Delete', disabled: true },
+];
+
+const priorities = [
+  { value: 'critical', label: 'Critical' },
+  { value: 'high', label: 'High' },
+  { separator: true },
+  { value: 'medium', label: 'Medium' },
+  { value: 'low', label: 'Low' },
+  { separator: true },
+  { value: 'none', label: 'No priority' },
+];
+
+// ── Basic
+demos.simple = FluteSelect.create('#d-simple', {
+  options: fruits,
+  placeholder: 'Select fruit...',
+  onChange: v => { document.getElementById('o-simple').textContent = String(v); },
+});
+
+demos.clearable = FluteSelect.create('#d-clearable', {
+  options: fruits,
+  placeholder: 'Clearable...',
+  clearable: true,
+  value: 'cherry',
+});
+
+// ── Native
+demos.native = FluteSelect.fromElement('#d-native');
+
+// ── Separators
+demos.sep = FluteSelect.create('#d-sep', {
+  options: actions,
+  placeholder: 'Actions...',
+});
+
+demos.sep2 = FluteSelect.create('#d-sep2', {
+  options: priorities,
+  placeholder: 'Priority...',
+  value: 'medium',
+  clearable: true,
+});
+
+// ── Grouped
+demos.grouped = FluteSelect.create('#d-grouped', {
+  options: foodGroups,
+  value: 'banana',
+});
+
+demos.tz = FluteSelect.create('#d-tz', {
+  options: tzGroups,
+  value: 'est',
+  searchable: true,
+});
+
+// ── Multi
+demos.multi = FluteSelect.create('#d-multi', {
+  options: langs,
+  multiple: true,
+  searchable: true,
+  clearable: true,
+  placeholder: 'Languages...',
+  value: ['ts', 'go'],
+  onChange: v => { document.getElementById('o-multi').textContent = JSON.stringify(v); },
+});
+
+demos.max = FluteSelect.create('#d-max', {
+  options: langs,
+  multiple: true,
+  maxItems: 3,
+  placeholder: 'Pick up to 3...',
+});
+
+// ── Search
+demos.search = FluteSelect.create('#d-search', {
+  options: fruits,
+  searchable: true,
+  placeholder: 'Type to filter...',
+});
+
+demos.create = FluteSelect.create('#d-create', {
+  options: [
+    { value: 'bug', label: 'Bug' },
+    { value: 'feature', label: 'Feature' },
+    { value: 'docs', label: 'Docs' },
+  ],
+  multiple: true,
+  searchable: true,
+  creatable: true,
+  createLabel: 'Create "{value}"',
+  placeholder: 'Add tags...',
+});
+
+// ── Rich
+demos.rich = FluteSelect.create('#d-rich', {
+  options: users,
+  searchable: true,
+  placeholder: 'Select user...',
+});
+
+// ── Custom tags (user cards)
+const teamMembers = [
+  { value: '1', label: 'Sarah Connor', description: 'Lead Engineer', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=sarah&size=40' },
+  { value: '2', label: 'John Doe', description: 'Designer', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=john&size=40' },
+  { value: '3', label: 'Alice Smith', description: 'PM', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=alice&size=40' },
+  { value: '4', label: 'Bob Builder', description: 'Backend', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=bob&size=40' },
+  { value: '5', label: 'Eve Hacker', description: 'Security', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=eve&size=40' },
+  { value: '6', label: 'Charlie Brown', description: 'QA', image: 'https://api.dicebear.com/8.x/avataaars/svg?seed=charlie&size=40' },
+];
+
+demos.userTags = FluteSelect.create('#d-user-tags', {
+  options: teamMembers,
+  multiple: true,
+  searchable: true,
+  clearable: true,
+  placeholder: 'Add team members...',
+  value: ['1', '3'],
+  renderTag: o => `
+    <img src="${o.image}" style="width:18px;height:18px;border-radius:50%;object-fit:cover">
+    <span class="fs__tag-label">${o.label}</span>
+    <span class="fs__tag-remove" role="button" data-value="${o.value}">
+      <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </span>
+  `,
+});
+
+const statuses = [
+  { value: 'active', label: 'Active', data: { c: '#22c55e' } },
+  { value: 'warning', label: 'Warning', data: { c: '#eab308' } },
+  { value: 'error', label: 'Error', data: { c: '#ef4444' } },
+];
+
+demos.custom = FluteSelect.create('#d-custom', {
+  options: statuses,
+  value: 'active',
+  renderOption: (o, { selected }) => `
+    <div style="display:flex;align-items:center;gap:8px;flex:1">
+      <span style="width:7px;height:7px;border-radius:50%;background:${o.data?.c}"></span>
+      ${o.label}
+    </div>
+    ${selected ? '<span style="color:' + o.data?.c + '">&#10003;</span>' : ''}
+  `,
+  renderSelected: o => `<span style="display:flex;align-items:center;gap:6px">
+    <span style="width:7px;height:7px;border-radius:50%;background:${o.data?.c}"></span>${o.label}
+  </span>`,
+});
+
+// ── Sizes
+demos.sm = FluteSelect.create('#d-sm', {
+  options: fruits.slice(0, 5),
+  size: 'sm',
+  placeholder: 'Small...',
+  clearable: true,
+  value: 'apple',
+});
+
+demos.md = FluteSelect.create('#d-md', {
+  options: fruits.slice(0, 5),
+  placeholder: 'Medium...',
+  clearable: true,
+  value: 'banana',
+});
+
+demos.lg = FluteSelect.create('#d-lg', {
+  options: fruits.slice(0, 5),
+  size: 'lg',
+  placeholder: 'Large...',
+  clearable: true,
+  value: 'cherry',
+});
+
+// ── Lazy (mocked)
+const _fetch = window.fetch;
+window.fetch = function(url, opts) {
+  if (typeof url === 'string' && url.startsWith('/api/users')) {
+    const p = new URL(url, 'http://x').searchParams;
+    const page = +(p.get('page') || 1), q = p.get('q') || '';
+    return new Promise(r => setTimeout(() => {
+      const items = [];
+      for (let i = (page-1)*15; i < Math.min(page*15, 60); i++) {
+        const n = `User ${i+1}`;
+        if (q && !n.toLowerCase().includes(q.toLowerCase())) continue;
+        items.push({ value: String(i+1), label: n, description: `user${i+1}@mail.io`,
+          image: `https://api.dicebear.com/8.x/avataaars/svg?seed=u${i+1}&size=40` });
+      }
+      document.getElementById('o-lazy').textContent = `page ${page} / ${items.length} items / q="${q}"`;
+      r({ ok:true, status:200, json: () => Promise.resolve({ data: items, meta: { page, last_page: 4, total: 60 } }) });
+    }, 400));
+  }
+  return _fetch.apply(this, arguments);
+};
+
+demos.lazy = FluteSelect.create('#d-lazy', {
+  source: '/api/users',
+  searchable: true,
+  clearable: true,
+  placeholder: 'Search users...',
+  lazy: { pageSize: 15, debounce: 400 },
+});
+
+// ── Light & Disabled
+demos.light = FluteSelect.create('#d-light', {
+  options: foodGroups,
+  placeholder: 'Light theme...',
+  searchable: true,
+  cssClass: 'fs--light',
+});
+
+demos.disabled = FluteSelect.create('#d-disabled', {
+  options: fruits.slice(0, 4),
+  placeholder: 'Disabled...',
+  disabled: true,
+  value: 'apple',
+});
+
+// ── API
+demos.api = FluteSelect.create('#d-api', {
+  options: fruits.slice(0, 6),
+  placeholder: 'Playground...',
+  multiple: true,
+  clearable: true,
+  searchable: true,
+});
+
+function api(a) {
+  const s = demos.api, o = document.getElementById('o-api');
+  switch(a) {
+    case 'open': s.open(); o.textContent = 'open()'; break;
+    case 'close': s.close(); o.textContent = 'close()'; break;
+    case 'sv': s.setValue(['grape','cherry']); o.textContent = 'setValue() → ' + JSON.stringify(s.getValue()); break;
+    case 'clear': s.clear(); o.textContent = 'clear()'; break;
+    case 'disable': s.disable(); o.textContent = 'disable()'; break;
+    case 'enable': s.enable(); o.textContent = 'enable()'; break;
+    case 'add': s.addOption({value:'kiwi',label:'Kiwi'}); o.textContent = 'addOption("Kiwi") count=' + s.count; break;
+    case 'rm': s.removeOption('apple'); o.textContent = 'removeOption("apple") count=' + s.count; break;
+    case 'all': s.selectAll(); o.textContent = 'selectAll() selected=' + s.selectedCount; break;
+    case 'none': s.deselectAll(); o.textContent = 'deselectAll()'; break;
+  }
+}
+window.api = api;
+
+// ── Events
+demos.events = FluteSelect.create('#d-events', {
+  options: fruits.slice(0, 6),
+  searchable: true,
+  clearable: true,
+  placeholder: 'Interact to see events...',
+});
+
+const elog = document.getElementById('o-events');
+function log(n, d) {
+  const t = new Date().toLocaleTimeString('en', { hour12: false });
+  elog.textContent += `${t}  ${n}${d !== undefined ? '  ' + JSON.stringify(d) : ''}\n`;
+  elog.scrollTop = elog.scrollHeight;
+}
+
+demos.events.on('open', () => log('open'))
+  .on('close', () => log('close'))
+  .on('change', e => log('change', e.value))
+  .on('search', e => log('search', e.query));
+
+// ── Aligned: data
+const countries = [
+  'Afghanistan','Albania','Algeria','Andorra','Angola','Argentina','Armenia',
+  'Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados',
+  'Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia','Botswana',
+  'Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cambodia','Cameroon',
+  'Canada','Cape Verde','Central African Republic','Chad','Chile','China',
+  'Colombia','Comoros','Congo','Costa Rica','Croatia','Cuba','Cyprus',
+  'Czech Republic','Denmark','Djibouti','Dominican Republic','Ecuador','Egypt',
+  'El Salvador','Equatorial Guinea','Eritrea','Estonia','Ethiopia','Fiji',
+  'Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece',
+  'Guatemala','Guinea','Guyana','Haiti','Honduras','Hungary','Iceland','India',
+  'Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan',
+  'Jordan','Kazakhstan','Kenya','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon',
+  'Liberia','Libya','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia',
+  'Maldives','Mali','Malta','Mexico','Moldova','Monaco','Mongolia','Montenegro',
+  'Morocco','Mozambique','Myanmar','Namibia','Nepal','Netherlands','New Zealand',
+  'Nicaragua','Niger','Nigeria','North Korea','Norway','Oman','Pakistan','Panama',
+  'Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia',
+  'Rwanda','Saudi Arabia','Senegal','Serbia','Singapore','Slovakia','Slovenia',
+  'Somalia','South Africa','South Korea','Spain','Sri Lanka','Sudan','Sweden',
+  'Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Tunisia',
+  'Turkey','Turkmenistan','Uganda','Ukraine','United Arab Emirates',
+  'United Kingdom','United States','Uruguay','Uzbekistan','Venezuela','Vietnam',
+  'Yemen','Zambia','Zimbabwe',
+].map(c => ({ value: c.toLowerCase().replace(/\s+/g, '-'), label: c }));
+
+const countryGroups = [
+  { label: 'Europe', options: countries.filter(c =>
+    ['germany','france','spain','italy','united-kingdom','netherlands','poland',
+     'sweden','norway','finland','denmark','austria','switzerland','belgium',
+     'czech-republic','portugal','greece','ireland','hungary','romania',
+     'croatia','serbia','bulgaria','slovakia','slovenia','estonia','latvia',
+     'lithuania','luxembourg','iceland','malta','monaco','montenegro',
+     'albania','andorra','bosnia','belarus','moldova','cyprus'].includes(c.value)
+  )},
+  { label: 'Asia', options: countries.filter(c =>
+    ['china','japan','india','south-korea','indonesia','thailand','vietnam',
+     'philippines','malaysia','singapore','taiwan','pakistan','bangladesh',
+     'myanmar','cambodia','laos','nepal','sri-lanka','maldives','bhutan',
+     'mongolia','north-korea','brunei','tajikistan','kyrgyzstan','kazakhstan',
+     'uzbekistan','turkmenistan','afghanistan','iran','iraq','israel','jordan',
+     'kuwait','lebanon','oman','qatar','saudi-arabia','syria','bahrain',
+     'united-arab-emirates','yemen','georgia','armenia','azerbaijan'].includes(c.value)
+  )},
+  { label: 'Americas', options: countries.filter(c =>
+    ['united-states','canada','mexico','brazil','argentina','chile','colombia',
+     'peru','venezuela','ecuador','bolivia','paraguay','uruguay','guyana',
+     'cuba','jamaica','haiti','honduras','guatemala','el-salvador','nicaragua',
+     'costa-rica','panama','belize','dominican-republic','bahamas','barbados'].includes(c.value)
+  )},
+  { label: 'Africa', options: countries.filter(c =>
+    ['nigeria','south-africa','egypt','kenya','ethiopia','ghana','tanzania',
+     'morocco','tunisia','algeria','libya','sudan','uganda','rwanda','senegal',
+     'cameroon','congo','mozambique','madagascar','malawi','zambia','zimbabwe',
+     'namibia','botswana','mali','niger','chad','burkina-faso','benin',
+     'guinea','liberia','sierra-leone','gabon','comoros','djibouti','eritrea',
+     'equatorial-guinea','cape-verde','central-african-republic','gambia',
+     'somalia','burundi','angola'].includes(c.value)
+  )},
+  { label: 'Oceania', options: countries.filter(c =>
+    ['australia','new-zealand','fiji'].includes(c.value)
+  )},
+];
+
+// ── Aligned
+demos.alignedFruits = FluteSelect.create('#d-aligned-fruits', {
+  options: fruits,
+  positioning: 'aligned',
+  value: 'mango',
+});
+
+demos.aligned1 = FluteSelect.create('#d-aligned1', {
+  options: foodGroups,
+  positioning: 'aligned',
+  value: 'banana',
+});
+
+demos.aligned2 = FluteSelect.create('#d-aligned2', {
+  options: tzGroups,
+  positioning: 'aligned',
+  value: 'cet',
+});
+
+// ── Aligned edge cases
+demos.alignedNone = FluteSelect.create('#d-aligned-none', {
+  options: countries,
+  positioning: 'aligned',
+  placeholder: '150+ countries...',
+});
+
+demos.alignedFew = FluteSelect.create('#d-aligned-few', {
+  options: countryGroups,
+  positioning: 'aligned',
+  value: 'germany',
+});
+
+demos.alignedLast = FluteSelect.create('#d-aligned-last', {
+  options: countries,
+  positioning: 'aligned',
+  value: 'zimbabwe',
+});
+</script>
+</body>
+</html>

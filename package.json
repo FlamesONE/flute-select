@@ -1,0 +1,62 @@
+{
+  "name": "flute-select",
+  "version": "1.0.0",
+  "description": "Custom select with aligned positioning, multi-select, search, separators, lazy loading, and HTMX support",
+  "main": "dist/flute-select.js",
+  "types": "dist/types/index.d.ts",
+  "type": "module",
+  "license": "MIT",
+  "author": "Flames",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/niceplugin/flute-select.git"
+  },
+  "keywords": [
+    "select",
+    "dropdown",
+    "combobox",
+    "multiselect",
+    "searchable",
+    "htmx",
+    "a11y",
+    "custom-select",
+    "floating-ui"
+  ],
+  "files": [
+    "dist/",
+    "styles/"
+  ],
+  "scripts": {
+    "build": "npm run typecheck && node esbuild.config.mjs",
+    "build:dev": "node esbuild.config.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/ --ext .ts && eslint tests/ --ext .ts -c .eslintrc.tests.json --no-eslintrc",
+    "lint:fix": "eslint src/ --ext .ts --fix && eslint tests/ --ext .ts -c .eslintrc.tests.json --no-eslintrc --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "ci": "npm run lint && npm run format:check && npm run typecheck && npm run test",
+    "version": "npm run build && git add -A dist/",
+    "prepublishOnly": "npm run ci && npm run build"
+  },
+  "dependencies": {
+    "@floating-ui/dom": "^1.7.6"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "esbuild": "^0.27.4",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^10.1.8",
+    "jsdom": "^28.1.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
