@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
   computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
-  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => {
+    cb();
+    return vi.fn();
+  }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -11,17 +14,30 @@ vi.mock('@floating-ui/dom', () => ({
 
 import { FluteSelect } from '../src/core/core';
 import {
-  createAnchor, FRUITS, GROUPED, RICH_OPTIONS, WITH_SEPARATORS,
+  createAnchor,
+  FRUITS,
+  GROUPED,
+  RICH_OPTIONS,
+  WITH_SEPARATORS,
   assertOptionCount,
-  getVisibleOptions, getGroupLabels, getSeparators, getSearchInput, typeInSearch,
+  getVisibleOptions,
+  getGroupLabels,
+  getSeparators,
+  getSearchInput,
+  typeInSearch,
 } from './helpers';
 
 // ── Options management ──────────────────────────────────────
 
 describe('Options — addOption', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('adds a new option', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -36,16 +52,22 @@ describe('Options — addOption', () => {
     expect(s.getOption('kiwi')).toBeDefined();
     s.open();
     const group = document.querySelector('.fs__group');
-    const values = Array.from(group?.querySelectorAll('.fs__option') ?? [])
-      .map((o) => o.getAttribute('data-value'));
+    const values = Array.from(group?.querySelectorAll('.fs__option') ?? []).map((o) =>
+      o.getAttribute('data-value'),
+    );
     expect(values).toContain('kiwi');
   });
 });
 
 describe('Options — removeOption', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('removes option and deselects it', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, value: 'apple' });
@@ -58,8 +80,13 @@ describe('Options — removeOption', () => {
 
 describe('Options — updateOptions', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('replaces all options', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, value: 'banana' });
@@ -83,8 +110,13 @@ describe('Options — updateOptions', () => {
 
 describe('Options — getOption', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('returns option by value', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -101,8 +133,13 @@ describe('Options — getOption', () => {
 
 describe('Options — Grouped rendering', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('renders group labels', () => {
     const s = FluteSelect.create(anchor, { options: GROUPED });
@@ -126,8 +163,13 @@ describe('Options — Grouped rendering', () => {
 
 describe('Options — Separators', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('renders separator elements', () => {
     const s = FluteSelect.create(anchor, { options: WITH_SEPARATORS });
@@ -163,8 +205,13 @@ describe('Options — Separators', () => {
 
 describe('Options — Custom renderOption', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('uses renderOption for dropdown items', () => {
     const s = FluteSelect.create(anchor, {
@@ -179,12 +226,18 @@ describe('Options — Custom renderOption', () => {
 
 describe('Options — Custom renderSelected', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('uses renderSelected for trigger label', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, value: 'apple',
+      options: FRUITS,
+      value: 'apple',
       renderSelected: (opt) => `<b>${opt.label}</b>`,
     });
     const label = s.element.querySelector('.fs__trigger-label');
@@ -194,12 +247,19 @@ describe('Options — Custom renderSelected', () => {
 
 describe('Options — Custom renderTag', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('uses renderTag for multi-select tags', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, multiple: true, value: ['apple'],
+      options: FRUITS,
+      multiple: true,
+      value: ['apple'],
       renderTag: (opt) => `<em>${opt.label}</em>`,
     });
     const tag = s.element.querySelector('.fs__tag');
@@ -209,12 +269,18 @@ describe('Options — Custom renderTag', () => {
 
 describe('Options — Custom renderEmpty', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('uses renderEmpty for empty state', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, searchable: true,
+      options: FRUITS,
+      searchable: true,
       renderEmpty: (q) => `<div class="custom-empty">Nothing for "${q}"</div>`,
     });
     s.open();
@@ -227,8 +293,13 @@ describe('Options — Custom renderEmpty', () => {
 
 describe('Options — Rich options', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('renders option with image and description', () => {
     const s = FluteSelect.create(anchor, { options: RICH_OPTIONS });

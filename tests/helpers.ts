@@ -59,7 +59,13 @@ export function createAnchor(): HTMLDivElement {
 }
 
 export function createNativeSelect(
-  options: { value: string; label: string; selected?: boolean; disabled?: boolean; group?: string }[],
+  options: {
+    value: string;
+    label: string;
+    selected?: boolean;
+    disabled?: boolean;
+    group?: string;
+  }[],
 ): HTMLSelectElement {
   const select = document.createElement('select');
   const groups = new Map<string, HTMLOptGroupElement>();
@@ -104,7 +110,9 @@ export function mouseEnter(el: HTMLElement): void {
 }
 
 export function pressKey(key: string, opts?: Partial<KeyboardEvent>): void {
-  document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...opts }));
+  document.dispatchEvent(
+    new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...opts }),
+  );
 }
 
 export function typeInSearch(input: HTMLInputElement, value: string): void {

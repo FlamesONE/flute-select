@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
   computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
-  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => {
+    cb();
+    return vi.fn();
+  }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -11,16 +14,32 @@ vi.mock('@floating-ui/dom', () => ({
 
 import { FluteSelect } from '../src/core/core';
 import {
-  createAnchor, FRUITS, FRUITS_WITH_DISABLED, EMPTY,
-  clickTrigger, pressKey,
-  assertOpen, assertClosed, assertHighlightedValue, assertNoHighlight,
-  getHighlighted, getTrigger, getVisibleOptions, getSearchInput, typeInSearch,
+  createAnchor,
+  FRUITS,
+  FRUITS_WITH_DISABLED,
+  EMPTY,
+  clickTrigger,
+  pressKey,
+  assertOpen,
+  assertClosed,
+  assertHighlightedValue,
+  assertNoHighlight,
+  getHighlighted,
+  getTrigger,
+  getVisibleOptions,
+  getSearchInput,
+  typeInSearch,
 } from './helpers';
 
 describe('Keyboard — ArrowDown', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('opens dropdown when trigger is focused and clicked', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -61,15 +80,20 @@ describe('Keyboard — ArrowDown', () => {
 
 describe('Keyboard — ArrowUp', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('moves highlight up', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
     s.open();
     pressKey('ArrowDown'); // apple
     pressKey('ArrowDown'); // banana
-    pressKey('ArrowUp');   // apple
+    pressKey('ArrowUp'); // apple
     assertHighlightedValue('apple');
   });
 
@@ -77,7 +101,7 @@ describe('Keyboard — ArrowUp', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
     s.open();
     pressKey('ArrowDown'); // apple (idx 0)
-    pressKey('ArrowUp');   // tries -1, fails -> stays at 0
+    pressKey('ArrowUp'); // tries -1, fails -> stays at 0
     assertHighlightedValue('apple');
   });
 
@@ -91,8 +115,13 @@ describe('Keyboard — ArrowUp', () => {
 
 describe('Keyboard — Home / End', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('Home jumps to first non-disabled option', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -136,8 +165,13 @@ describe('Keyboard — Home / End', () => {
 
 describe('Keyboard — Enter', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('selects highlighted option', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -175,7 +209,9 @@ describe('Keyboard — Enter', () => {
 
   it('creates option when no highlight + creatable + search query', async () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, searchable: true, creatable: true,
+      options: FRUITS,
+      searchable: true,
+      creatable: true,
     });
     s.open();
     const input = getSearchInput()!;
@@ -189,8 +225,13 @@ describe('Keyboard — Enter', () => {
 
 describe('Keyboard — Escape', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('closes dropdown', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -211,8 +252,13 @@ describe('Keyboard — Escape', () => {
 
 describe('Keyboard — Tab', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('closes dropdown without preventing default', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -227,8 +273,13 @@ describe('Keyboard — Tab', () => {
 
 describe('Keyboard — Type-ahead (non-searchable)', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('highlights matching option by first letter', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, searchable: false });
@@ -241,7 +292,7 @@ describe('Keyboard — Type-ahead (non-searchable)', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, searchable: false });
     s.open();
     pressKey('End'); // pineapple (last)
-    pressKey('a');   // wrap -> apple
+    pressKey('a'); // wrap -> apple
     assertHighlightedValue('apple');
   });
 
@@ -267,8 +318,13 @@ describe('Keyboard — Type-ahead (non-searchable)', () => {
 
 describe('Keyboard — Empty list', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('all navigation keys are no-ops', () => {
     const s = FluteSelect.create(anchor, { options: EMPTY });
@@ -285,8 +341,13 @@ describe('Keyboard — Empty list', () => {
 
 describe('Keyboard — aria-activedescendant', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('updates on highlight change', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });

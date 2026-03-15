@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
   computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
-  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => {
+    cb();
+    return vi.fn();
+  }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -11,15 +14,30 @@ vi.mock('@floating-ui/dom', () => ({
 
 import { FluteSelect } from '../src/core/core';
 import {
-  createAnchor, createNativeSelect, FRUITS, EMPTY,
-  clickTrigger, clickOutside, assertOpen, assertClosed, assertTriggerLabel,
-  assertPlaceholder, getDropdown, getVisibleOptions, getTrigger,
+  createAnchor,
+  createNativeSelect,
+  FRUITS,
+  EMPTY,
+  clickTrigger,
+  clickOutside,
+  assertOpen,
+  assertClosed,
+  assertTriggerLabel,
+  assertPlaceholder,
+  getDropdown,
+  getVisibleOptions,
+  getTrigger,
 } from './helpers';
 
 describe('Rendering & Initial State', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('creates DOM after anchor element', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -82,8 +100,13 @@ describe('Rendering & Initial State', () => {
 
 describe('Open & Close', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('trigger click opens', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -107,7 +130,8 @@ describe('Open & Close', () => {
 
   it('double open is no-op', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
-    s.open(); s.open();
+    s.open();
+    s.open();
     assertOpen(s.element);
   });
 
@@ -119,8 +143,10 @@ describe('Open & Close', () => {
 
   it('toggle works', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
-    s.toggle(); assertOpen(s.element);
-    s.toggle(); assertClosed(s.element);
+    s.toggle();
+    assertOpen(s.element);
+    s.toggle();
+    assertClosed(s.element);
   });
 
   it('disable() closes open dropdown', () => {
@@ -141,8 +167,13 @@ describe('Open & Close', () => {
 
 describe('Lifecycle & Registry', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('destroy removes DOM and unregisters', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -174,7 +205,8 @@ describe('Lifecycle & Registry', () => {
   });
 
   it('destroyAll cleans everything', () => {
-    const a1 = createAnchor(); const a2 = createAnchor();
+    const a1 = createAnchor();
+    const a2 = createAnchor();
     FluteSelect.create(a1, { options: FRUITS });
     FluteSelect.create(a2, { options: FRUITS });
     FluteSelect.destroyAll();
@@ -193,7 +225,10 @@ describe('Lifecycle & Registry', () => {
 });
 
 describe('Native <select>', () => {
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('reads options and selected value', () => {
     const native = createNativeSelect([

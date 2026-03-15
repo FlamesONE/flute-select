@@ -3,7 +3,10 @@ import { mockFetch } from './setup';
 
 vi.mock('@floating-ui/dom', () => ({
   computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
-  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => {
+    cb();
+    return vi.fn();
+  }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -26,12 +29,17 @@ function mockJsonResponse(data: unknown, ok = true): void {
 // ── LazyLoader unit tests ───────────────────────────────────
 
 describe('LazyLoader — URL building', () => {
-  afterEach(() => { mockFetch.mockReset(); });
+  afterEach(() => {
+    mockFetch.mockReset();
+  });
 
   it('builds correct URL with params', async () => {
     mockJsonResponse({ data: [{ value: '1', label: 'One' }], meta: { last_page: 1 } });
     const loader = new LazyLoader('/api/items', {
-      searchParam: 'search', pageParam: 'p', pageSizeParam: 'limit', pageSize: 10,
+      searchParam: 'search',
+      pageParam: 'p',
+      pageSizeParam: 'limit',
+      pageSize: 10,
     });
     await loader.load(2, 'hello');
     expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -60,7 +68,9 @@ describe('LazyLoader — URL building', () => {
 });
 
 describe('LazyLoader — transformResponse', () => {
-  afterEach(() => { mockFetch.mockReset(); });
+  afterEach(() => {
+    mockFetch.mockReset();
+  });
 
   it('uses transformResponse when provided', async () => {
     mockJsonResponse({ results: [{ id: 5, name: 'Five' }] });
@@ -76,7 +86,9 @@ describe('LazyLoader — transformResponse', () => {
 });
 
 describe('LazyLoader — hasMore', () => {
-  afterEach(() => { mockFetch.mockReset(); });
+  afterEach(() => {
+    mockFetch.mockReset();
+  });
 
   it('determines hasMore from lastPagePath', async () => {
     mockJsonResponse({ data: [{ value: '1', label: 'A' }], meta: { last_page: 3 } });
@@ -91,7 +103,9 @@ describe('LazyLoader — hasMore', () => {
 });
 
 describe('LazyLoader — Errors', () => {
-  afterEach(() => { mockFetch.mockReset(); });
+  afterEach(() => {
+    mockFetch.mockReset();
+  });
 
   it('throws on non-ok response', async () => {
     mockJsonResponse({}, false);
@@ -101,7 +115,9 @@ describe('LazyLoader — Errors', () => {
 });
 
 describe('LazyLoader — Headers', () => {
-  afterEach(() => { mockFetch.mockReset(); });
+  afterEach(() => {
+    mockFetch.mockReset();
+  });
 
   it('sends custom headers', async () => {
     mockJsonResponse({ data: [], meta: { last_page: 1 } });
@@ -125,7 +141,9 @@ describe('LazyLoader — Headers', () => {
 });
 
 describe('LazyLoader — Abort', () => {
-  afterEach(() => { mockFetch.mockReset(); });
+  afterEach(() => {
+    mockFetch.mockReset();
+  });
 
   it('abort() cancels pending request', () => {
     const abortSpy = vi.spyOn(AbortController.prototype, 'abort');
@@ -166,8 +184,14 @@ describe('LazyLoader — Config accessors', () => {
 
 describe('Lazy Loading — Integration', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); mockFetch.mockReset(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+    mockFetch.mockReset();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('loads options on first open', async () => {
     mockJsonResponse({

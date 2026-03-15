@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
   computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
-  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => {
+    cb();
+    return vi.fn();
+  }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -14,15 +17,23 @@ import { createAnchor, FRUITS, getTrigger } from './helpers';
 
 describe('Events — onChange', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('fires with value and option on setValue', () => {
     const onChange = vi.fn();
     const s = FluteSelect.create(anchor, { options: FRUITS, onChange });
     s.setValue('apple');
     expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).toHaveBeenCalledWith('apple', expect.objectContaining({ value: 'apple', label: 'Apple' }));
+    expect(onChange).toHaveBeenCalledWith(
+      'apple',
+      expect.objectContaining({ value: 'apple', label: 'Apple' }),
+    );
   });
 
   it('silent=true suppresses onChange', () => {
@@ -48,8 +59,13 @@ describe('Events — onChange', () => {
 
 describe('Events — onOpen / onClose', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('onOpen fires on open', () => {
     const onOpen = vi.fn();
@@ -69,8 +85,13 @@ describe('Events — onOpen / onClose', () => {
 
 describe('Events — on / off', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('on() registers and off() unregisters handler', () => {
     const handler = vi.fn();
@@ -100,8 +121,13 @@ describe('Events — on / off', () => {
 
 describe('Events — CustomEvent dispatch', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('fs:change dispatches on container with detail', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -134,11 +160,18 @@ describe('Events — CustomEvent dispatch', () => {
 
 describe('Events — Error handling', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('error in handler does not crash other handlers', () => {
-    const badHandler = vi.fn(() => { throw new Error('boom'); });
+    const badHandler = vi.fn(() => {
+      throw new Error('boom');
+    });
     const goodHandler = vi.fn();
     const s = FluteSelect.create(anchor, { options: FRUITS });
     s.on('change', badHandler);
@@ -154,8 +187,13 @@ describe('Events — Error handling', () => {
 
 describe('Events — focus / blur', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('focus event fires on trigger focus', () => {
     const handler = vi.fn();

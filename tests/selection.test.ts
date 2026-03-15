@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
   computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
-  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => {
+    cb();
+    return vi.fn();
+  }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -11,16 +14,28 @@ vi.mock('@floating-ui/dom', () => ({
 
 import { FluteSelect } from '../src/core/core';
 import {
-  createAnchor, FRUITS, FRUITS_WITH_DISABLED,
-  clickTrigger, assertOpen, assertClosed, assertSelectedValues,
-  assertTriggerLabel, assertPlaceholder,
-  getVisibleOptions, getTags,
+  createAnchor,
+  FRUITS,
+  FRUITS_WITH_DISABLED,
+  clickTrigger,
+  assertOpen,
+  assertClosed,
+  assertSelectedValues,
+  assertTriggerLabel,
+  assertPlaceholder,
+  getVisibleOptions,
+  getTags,
 } from './helpers';
 
 describe('Selection — Single mode', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('click selects and closes', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS });
@@ -95,8 +110,13 @@ describe('Selection — Single mode', () => {
 
 describe('Selection — Multi mode', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('click toggles selection', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true });
@@ -123,7 +143,9 @@ describe('Selection — Multi mode', () => {
 
   it('renders tags with remove buttons', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, multiple: true, value: ['apple', 'grape'],
+      options: FRUITS,
+      multiple: true,
+      value: ['apple', 'grape'],
     });
     const tags = getTags(s.element);
     expect(tags).toHaveLength(2);
@@ -134,22 +156,27 @@ describe('Selection — Multi mode', () => {
 
   it('tag remove deselects value', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, multiple: true, value: ['apple', 'banana'],
+      options: FRUITS,
+      multiple: true,
+      value: ['apple', 'banana'],
     });
     const removeBtn = s.element.querySelector('.fs__tag-remove') as HTMLElement;
     removeBtn.click();
-    expect((s.getValue() as string[])).toHaveLength(1);
+    expect(s.getValue() as string[]).toHaveLength(1);
   });
 
   it('maxItems prevents excess selections', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, multiple: true, maxItems: 2, value: ['apple', 'banana'],
+      options: FRUITS,
+      multiple: true,
+      maxItems: 2,
+      value: ['apple', 'banana'],
     });
     s.open();
     const cherry = getVisibleOptions().find((o) => o.getAttribute('data-value') === 'cherry');
     cherry?.click();
-    expect((s.getValue() as string[])).toHaveLength(2);
-    expect((s.getValue() as string[])).not.toContain('cherry');
+    expect(s.getValue() as string[]).toHaveLength(2);
+    expect(s.getValue() as string[]).not.toContain('cherry');
   });
 
   it('selectAll selects all non-disabled options', () => {
@@ -164,12 +191,14 @@ describe('Selection — Multi mode', () => {
   it('selectAll respects maxItems', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, multiple: true, maxItems: 2 });
     s.selectAll();
-    expect((s.getValue() as string[])).toHaveLength(2);
+    expect(s.getValue() as string[]).toHaveLength(2);
   });
 
   it('deselectAll clears all', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, multiple: true, value: ['apple', 'banana'],
+      options: FRUITS,
+      multiple: true,
+      value: ['apple', 'banana'],
     });
     s.deselectAll();
     expect(s.getValue()).toEqual([]);
@@ -182,14 +211,18 @@ describe('Selection — Multi mode', () => {
 
   it('getValue returns array of selected values', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, multiple: true, value: ['apple', 'cherry'],
+      options: FRUITS,
+      multiple: true,
+      value: ['apple', 'cherry'],
     });
     expect(s.getValue()).toEqual(['apple', 'cherry']);
   });
 
   it('hasValue() works in multi mode', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, multiple: true, value: ['apple', 'cherry'],
+      options: FRUITS,
+      multiple: true,
+      value: ['apple', 'cherry'],
     });
     expect(s.hasValue('apple')).toBe(true);
     expect(s.hasValue('banana')).toBe(false);
@@ -197,7 +230,9 @@ describe('Selection — Multi mode', () => {
 
   it('getSelectedOptions() returns full objects in multi mode', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, multiple: true, value: ['apple', 'cherry'],
+      options: FRUITS,
+      multiple: true,
+      value: ['apple', 'cherry'],
     });
     const selected = s.getSelectedOptions();
     expect(selected).toHaveLength(2);

@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
   computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
-  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => {
+    cb();
+    return vi.fn();
+  }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -14,8 +17,13 @@ import { createAnchor, createNativeSelect, FRUITS, getHiddenInputs } from './hel
 
 describe('Form — Hidden inputs', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('creates hidden input with configured name', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, name: 'fruit', value: 'banana' });
@@ -27,7 +35,10 @@ describe('Form — Hidden inputs', () => {
 
   it('creates multiple inputs with [] suffix for multi-select', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, name: 'fruits', multiple: true, value: ['apple', 'cherry'],
+      options: FRUITS,
+      name: 'fruits',
+      multiple: true,
+      value: ['apple', 'cherry'],
     });
     const inputs = getHiddenInputs(s.element);
     expect(inputs).toHaveLength(2);
@@ -61,12 +72,20 @@ describe('Form — Hidden inputs', () => {
 
 describe('Form — Clear button', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('clears value and updates hidden input', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, name: 'f', value: 'banana', clearable: true,
+      options: FRUITS,
+      name: 'f',
+      value: 'banana',
+      clearable: true,
     });
     const clearBtn = s.element.querySelector('[aria-label="Clear"]') as HTMLElement;
     expect(clearBtn).not.toBeNull();
@@ -79,7 +98,10 @@ describe('Form — Clear button', () => {
 });
 
 describe('Form — Native select sync', () => {
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('syncs value back to native select on change', () => {
     const native = createNativeSelect([

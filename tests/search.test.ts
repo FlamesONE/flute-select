@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('@floating-ui/dom', () => ({
   computePosition: vi.fn(() => Promise.resolve({ x: 0, y: 100, placement: 'bottom-start' })),
-  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => { cb(); return vi.fn(); }),
+  autoUpdate: vi.fn((_r: Element, _f: Element, cb: () => void) => {
+    cb();
+    return vi.fn();
+  }),
   flip: vi.fn(() => ({ name: 'flip', fn: () => ({}) })),
   shift: vi.fn(() => ({ name: 'shift', fn: () => ({}) })),
   offset: vi.fn(() => ({ name: 'offset', fn: () => ({}) })),
@@ -12,9 +15,13 @@ vi.mock('@floating-ui/dom', () => ({
 import { FluteSelect } from '../src/core/core';
 import { filterOptions } from '../src/utils/search';
 import {
-  createAnchor, FRUITS,
-  assertOpen, assertOptionCount,
-  getVisibleOptions, getSearchInput, typeInSearch,
+  createAnchor,
+  FRUITS,
+  assertOpen,
+  assertOptionCount,
+  getVisibleOptions,
+  getSearchInput,
+  typeInSearch,
 } from './helpers';
 
 // ── filterOptions unit tests ────────────────────────────────
@@ -64,8 +71,13 @@ describe('filterOptions (unit)', () => {
 
 describe('Search — Input rendering', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('renders search input only when searchable=true', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, searchable: true });
@@ -82,8 +94,13 @@ describe('Search — Input rendering', () => {
 
 describe('Search — Filtering', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('typing filters displayed options', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, searchable: true });
@@ -96,7 +113,9 @@ describe('Search — Filtering', () => {
 
   it('empty result shows empty state', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, searchable: true, emptyText: 'Nothing found',
+      options: FRUITS,
+      searchable: true,
+      emptyText: 'Nothing found',
     });
     s.open();
     typeInSearch(getSearchInput()!, 'zzz');
@@ -117,8 +136,13 @@ describe('Search — Filtering', () => {
 
 describe('Search — Callbacks & Events', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('onSearch callback fires', () => {
     const onSearch = vi.fn();
@@ -140,8 +164,13 @@ describe('Search — Callbacks & Events', () => {
 
 describe('Search — Input interaction', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('search input click does not close dropdown', () => {
     const s = FluteSelect.create(anchor, { options: FRUITS, searchable: true });
@@ -156,12 +185,20 @@ describe('Search — Input interaction', () => {
 
 describe('Search — Creatable', () => {
   let anchor: HTMLDivElement;
-  beforeEach(() => { anchor = createAnchor(); });
-  afterEach(() => { FluteSelect.destroyAll(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    anchor = createAnchor();
+  });
+  afterEach(() => {
+    FluteSelect.destroyAll();
+    document.body.innerHTML = '';
+  });
 
   it('shows create option when no match', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, searchable: true, creatable: true, createLabel: 'Add "{value}"',
+      options: FRUITS,
+      searchable: true,
+      creatable: true,
+      createLabel: 'Add "{value}"',
     });
     s.open();
     typeInSearch(getSearchInput()!, 'kiwi');
@@ -171,7 +208,9 @@ describe('Search — Creatable', () => {
 
   it('does NOT show create when query matches existing label', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, searchable: true, creatable: true,
+      options: FRUITS,
+      searchable: true,
+      creatable: true,
     });
     s.open();
     typeInSearch(getSearchInput()!, 'Apple');
@@ -180,7 +219,9 @@ describe('Search — Creatable', () => {
 
   it('clicking create adds option and selects it', () => {
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, searchable: true, creatable: true,
+      options: FRUITS,
+      searchable: true,
+      creatable: true,
     });
     s.open();
     typeInSearch(getSearchInput()!, 'kiwi');
@@ -193,7 +234,9 @@ describe('Search — Creatable', () => {
   it('fires create event', () => {
     const handler = vi.fn();
     const s = FluteSelect.create(anchor, {
-      options: FRUITS, searchable: true, creatable: true,
+      options: FRUITS,
+      searchable: true,
+      creatable: true,
     });
     s.on('create', handler);
     s.open();
@@ -206,7 +249,9 @@ describe('Search — Creatable', () => {
 
   it('onCreate callback transforms the option', async () => {
     const s = FluteSelect.create(anchor, {
-      options: [], searchable: true, creatable: true,
+      options: [],
+      searchable: true,
+      creatable: true,
       onCreate: (v) => ({ value: `id-${v}`, label: v.toUpperCase() }),
     });
     s.open();
@@ -220,7 +265,9 @@ describe('Search — Creatable', () => {
 
   it('shows create option on empty list with search query', () => {
     const s = FluteSelect.create(anchor, {
-      options: [], searchable: true, creatable: true,
+      options: [],
+      searchable: true,
+      creatable: true,
     });
     s.open();
     typeInSearch(getSearchInput()!, 'new');
