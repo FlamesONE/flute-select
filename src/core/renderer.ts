@@ -438,11 +438,21 @@ export class Renderer {
         selected: isSelected,
         highlighted: isHighlighted,
       });
+      if (isSelected) {
+        const check = el('span', { class: CSS.optionCheck });
+        check.innerHTML = ICONS.check;
+        node.appendChild(check);
+      }
       return node;
     }
 
     if (option.html) {
       node.innerHTML = option.html;
+      if (isSelected) {
+        const check = el('span', { class: CSS.optionCheck });
+        check.innerHTML = ICONS.check;
+        node.appendChild(check);
+      }
       return node;
     }
 
