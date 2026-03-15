@@ -9,7 +9,14 @@ import { Renderer } from './renderer';
 import { Debouncer, filterOptions } from '../utils/search';
 import { SelectState } from './state';
 import { Registry } from '../plugins/registry';
-import type { SelectConfig, SelectItem, SelectOption, EventName, EventHandler, PositionMode } from '../types';
+import type {
+  SelectConfig,
+  SelectItem,
+  SelectOption,
+  EventName,
+  EventHandler,
+  PositionMode,
+} from '../types';
 
 let uid = 0;
 
@@ -165,9 +172,7 @@ export class FluteSelect {
 
     this.emitter.emit('open', undefined);
     this.config.onOpen?.();
-    this.renderer.container.dispatchEvent(
-      new CustomEvent('fs:open', { bubbles: true }),
-    );
+    this.renderer.container.dispatchEvent(new CustomEvent('fs:open', { bubbles: true }));
   }
 
   close(): void {
@@ -193,9 +198,7 @@ export class FluteSelect {
 
     this.emitter.emit('close', undefined);
     this.config.onClose?.();
-    this.renderer.container.dispatchEvent(
-      new CustomEvent('fs:close', { bubbles: true }),
-    );
+    this.renderer.container.dispatchEvent(new CustomEvent('fs:close', { bubbles: true }));
   }
 
   toggle(): void {

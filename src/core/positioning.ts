@@ -139,7 +139,11 @@ export class Positioning {
     const contentPaddingBottom = parseInt(contentStyles.paddingBottom, 10) || 0;
 
     const fullContentHeight =
-      contentBorderTop + contentPaddingTop + listScrollH + contentPaddingBottom + contentBorderBottom;
+      contentBorderTop +
+      contentPaddingTop +
+      listScrollH +
+      contentPaddingBottom +
+      contentBorderBottom;
 
     if (!selectedEl) {
       const wrapperH = Math.min(availableHeight, fullContentHeight);
@@ -159,18 +163,14 @@ export class Positioning {
       const selectedItemHalfH = selectedEl.offsetHeight / 2;
       const itemOffsetMiddle = selectedEl.offsetTop + selectedItemHalfH;
 
-      const contentTopToItemMiddle =
-        contentBorderTop + contentPaddingTop + itemOffsetMiddle;
+      const contentTopToItemMiddle = contentBorderTop + contentPaddingTop + itemOffsetMiddle;
       const itemMiddleToContentBottom = fullContentHeight - contentTopToItemMiddle;
 
       const triggerMidY = triggerRect.top + triggerRect.height / 2;
       const topEdgeToTriggerMiddle = triggerMidY - CONTENT_MARGIN;
       const triggerMiddleToBottomEdge = availableHeight - topEdgeToTriggerMiddle;
 
-      const minContentHeight = Math.min(
-        selectedEl.offsetHeight * 5,
-        fullContentHeight,
-      );
+      const minContentHeight = Math.min(selectedEl.offsetHeight * 5, fullContentHeight);
 
       const willAlignWithoutTopOverflow = contentTopToItemMiddle <= topEdgeToTriggerMiddle;
 
@@ -179,8 +179,7 @@ export class Positioning {
       let scrollTop = 0;
 
       if (willAlignWithoutTopOverflow) {
-        const listOffsetBottom =
-          content.clientHeight - list.offsetTop - list.offsetHeight;
+        const listOffsetBottom = content.clientHeight - list.offsetTop - list.offsetHeight;
         const clampedTriggerMiddleToBottomEdge = Math.max(
           triggerMiddleToBottomEdge,
           selectedItemHalfH + listPaddingBottom + listOffsetBottom + contentBorderBottom,
@@ -199,7 +198,11 @@ export class Positioning {
 
       wrapperH = Math.min(wrapperH, fullContentHeight, availableHeight);
       wrapperH = Math.max(wrapperH, minContentHeight);
-      wrapperTop = clamp(wrapperTop, CONTENT_MARGIN, window.innerHeight - wrapperH - CONTENT_MARGIN);
+      wrapperTop = clamp(
+        wrapperTop,
+        CONTENT_MARGIN,
+        window.innerHeight - wrapperH - CONTENT_MARGIN,
+      );
 
       wrapper.style.top = `${wrapperTop}px`;
       wrapper.style.height = `${wrapperH}px`;

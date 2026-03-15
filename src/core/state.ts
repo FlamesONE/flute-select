@@ -1,4 +1,10 @@
-import type { SelectConfig, SelectItem, SelectOption, SelectGroup, SelectSeparator } from '../types';
+import type {
+  SelectConfig,
+  SelectItem,
+  SelectOption,
+  SelectGroup,
+  SelectSeparator,
+} from '../types';
 
 export function isGroup(item: SelectItem): item is SelectGroup {
   return 'options' in item && Array.isArray((item as unknown as SelectGroup).options);

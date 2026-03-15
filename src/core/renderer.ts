@@ -275,7 +275,9 @@ export class Renderer {
         const tick = (): void => {
           this.list.scrollTop += dir * SCROLL_SPEED;
           this.updateScrollArrows();
-          this.scrollInterval = requestAnimationFrame(tick) as unknown as ReturnType<typeof setInterval>;
+          this.scrollInterval = requestAnimationFrame(tick) as unknown as ReturnType<
+            typeof setInterval
+          >;
         };
         tick();
       };
